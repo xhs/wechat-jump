@@ -8,6 +8,7 @@ import time
 import math
 
 TOP_SECRET = 2.326
+DEBUG = True
 
 
 def take_and_download_screenshot():
@@ -157,22 +158,25 @@ def jump_dude_jump(distance):
 
 
 if __name__ == '__main__':
-    os.makedirs('screenshots', exist_ok=True)
+    if DEBUG:
+        os.makedirs('screenshots', exist_ok=True)
+        os.makedirs('traces', exist_ok=True)
+
     while True:
         path = take_and_download_screenshot()
 
         cropped = get_cropped_image(path)
         grayscale = get_grayscale_image(cropped)
-        grayscale.save(f'gr{int(time.time())}.png')
 
         dest = locate_destination(grayscale)
         src = locate_source(cropped)
         distance = math.sqrt((dest.x - src.x) ** 2 + (dest.y - src.y) ** 2)
         print(src, dest, distance)
 
-        draw = ImageDraw.Draw(grayscale)
-        draw.line([(src.x, src.y), (dest.x, dest.y)], fill='black')
-        grayscale.save(f'{int(time.time())}.png')
+        if DEBUG:
+            draw = ImageDraw.Draw(grayscale)
+            draw.line([(src.x, src.y), (dest.x, dest.y)], fill='black')
+            grayscale.save(f'traces/{int(time.time())}.png')
 
         jump_dude_jump(distance)
         time.sleep(0.8)
